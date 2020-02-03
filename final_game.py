@@ -70,6 +70,11 @@ def show_score(screen, font, score_val, x, y):
     screen.blit(score, (x, y))
 
 
+def game_over(screen, font, x, y):
+    text = font.render('GAME OVER', True, (255, 255, 255))
+    screen.blit(text, (x, y))
+
+
 def game_loop():
     # title and icon
     score = 0
@@ -82,7 +87,7 @@ def game_loop():
     bullet, bullet_x, bullet_y = bullet_details()
     # Game loop
     bullet_state = 'ready'
-    enemyX_change = 5
+    enemyX_change = 10
     bulletY_change = 20
     enemyYchange = 0
     running = True
@@ -92,7 +97,7 @@ def game_loop():
         screen = rendering_screen()
         for event in pygame.event.get():
 
-            if event.type == pygame.QUIT or enemy_y == 410:
+            if event.type == pygame.QUIT:
                 running = False
                 print('Score= ', score)
             if event.type == pygame.KEYUP:
@@ -113,7 +118,7 @@ def game_loop():
 
         if enemy_x >= 736 or enemy_x < 0:
             enemyX_change = -enemyX_change
-            enemyYchange = 1  # diagonally come down on every turn
+            enemyYchange = 3  # diagonally come down on every turn
         enemy_x += enemyX_change
         enemy_y += enemyYchange
 
@@ -123,6 +128,7 @@ def game_loop():
         if bullet_state == 'fire':
             bullet_state = bullet_blitting(screen, bullet, temp_x, bullet_y)
             bullet_y -= bulletY_change
+
         # Checking collision... gotta send player_x value (could have stored in bullet_x)
         collision = check_collision(enemy_x, enemy_y, player_x, bullet_y)
         if collision:
@@ -137,6 +143,10 @@ def game_loop():
         player_blitting(screen, player, player_x, player_y)
         enemy_blitting(screen, enemy, enemy_x, enemy_y)
         show_score(screen, font, score, score_x, score_y)
+        if enemy_y >= 400:
+            game_over(screen, font, 200, 250)
+            score = 0
+            # running = False
         pygame.display.update()  # to update the screen (needs to be there to implement any changes)
 
 
