@@ -1,6 +1,7 @@
 import pygame
 import random
 import os
+import math
 
 # Initialise pygame
 pygame.init()
@@ -32,6 +33,23 @@ def enemy_details():
     return enemy, enemy_x, enemy_y
 
 
+def check_collision(enemy_x, enemy_y, bullet_x, bullet_y):
+    distance = math.sqrt((math.pow(enemy_x - bullet_x, 2)) + (math.pow(enemy_y - bullet_y, 2)))
+    if distance < 30:
+        return True
+    else:
+        return False
+
+
+# ready - not firing
+# fire - firing
+def bullet_details():
+    bullet = pygame.image.load('scythe.png')
+    bullet_x = 0
+    bullet_y = 480  # same as our player
+    return bullet, bullet_x, bullet_y
+
+
 # For drawing an image on another image.
 def player_blitting(screen, player_img, player_x, player_y):
     screen.blit(player_img, (player_x, player_y))
@@ -41,13 +59,31 @@ def enemy_blitting(screen, enemy_img, enemy_x, enemy_y):
     screen.blit(enemy_img, (enemy_x, enemy_y))
 
 
+def bullet_blitting(screen, bullet_img, bullet_x, bullet_y):
+    bullet_state = 'fire'
+    screen.blit(bullet_img, (bullet_x + 16, bullet_y + 10))
+    return bullet_state
+
+
+def show_score(screen, font, score_val, x, y):
+    score = font.render("Score: " + str(score_val), True, (255, 255, 255))
+    screen.blit(score, (x, y))
+
+
 def game_loop():
     # title and icon
+    score = 0
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    score_x = 10
+    score_y = 10
     pygame.display.set_caption('God Killer')
     player, player_x, player_y = player_details()
     enemy, enemy_x, enemy_y = enemy_details()
+    bullet, bullet_x, bullet_y = bullet_details()
     # Game loop
-    enemyX_change = 7
+    bullet_state = 'ready'
+    enemyX_change = 5
+    bulletY_change = 20
     enemyYchange = 0
     running = True
     while running:
@@ -56,13 +92,18 @@ def game_loop():
         screen = rendering_screen()
         for event in pygame.event.get():
 
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or enemy_y == 410:
                 running = False
+                print('Score= ', score)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     playerx_change = -9
                 if event.key == pygame.K_RIGHT:
                     playerx_change = 9
+                if event.key == pygame.K_SPACE:
+                    if bullet_state == 'ready':
+                        temp_x = player_x
+                        bullet_state = bullet_blitting(screen, bullet, temp_x, bullet_y)
         player_x += playerx_change
 
         if player_x < 0:
@@ -75,8 +116,27 @@ def game_loop():
             enemyYchange = 1  # diagonally come down on every turn
         enemy_x += enemyX_change
         enemy_y += enemyYchange
+
+        if bullet_y <= 0:
+            bullet_y = 480
+            bullet_state = 'ready'
+        if bullet_state == 'fire':
+            bullet_state = bullet_blitting(screen, bullet, temp_x, bullet_y)
+            bullet_y -= bulletY_change
+        # Checking collision... gotta send player_x value (could have stored in bullet_x)
+        collision = check_collision(enemy_x, enemy_y, player_x, bullet_y)
+        if collision:
+            bullet_y = 480
+            bullet_state = 'ready'
+            score += 1
+            if score % 5 == 0:
+                bulletY_change += 10
+            enemy, enemy_x, enemy_y = enemy_details()
+            enemyX_change += score
+
         player_blitting(screen, player, player_x, player_y)
         enemy_blitting(screen, enemy, enemy_x, enemy_y)
+        show_score(screen, font, score, score_x, score_y)
         pygame.display.update()  # to update the screen (needs to be there to implement any changes)
 
 
