@@ -7,4 +7,8 @@ Simply install requirements
 
 and run "final_game.py"
 
+Sample Outputs:
+
+![alt text](https://github.com/shivekchhabra/Game--God-Killer/blob/master/Outputs/output.png)
+![alt text](https://github.com/shivekchhabra/Game--God-Killer/blob/master/Outputs/output2.png)
 
