@@ -1,6 +1,7 @@
 import pygame
 import random
 import os
+import time
 import math
 
 # Initialise pygame
@@ -35,7 +36,7 @@ def enemy_details():
 
 def check_collision(enemy_x, enemy_y, bullet_x, bullet_y):
     distance = math.sqrt((math.pow(enemy_x - bullet_x, 2)) + (math.pow(enemy_y - bullet_y, 2)))
-    if distance < 30:
+    if distance < 50:
         return True
     else:
         return False
@@ -79,7 +80,7 @@ def game_loop():
     # title and icon
     score = 0
     font = pygame.font.Font('freesansbold.ttf', 32)
-    over_font=pygame.font.Font('freesansbold.ttf',64)
+    over_font = pygame.font.Font('freesansbold.ttf', 64)
     score_x = 10
     score_y = 10
     pygame.display.set_caption('God Killer')
@@ -89,7 +90,7 @@ def game_loop():
     # Game loop
     bullet_state = 'ready'
     enemyX_change = 10
-    bulletY_change = 20
+    bulletY_change = 40
     enemyYchange = 0
     running = True
     while running:
@@ -103,9 +104,9 @@ def game_loop():
                 print('Score= ', score)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
-                    playerx_change = -20
+                    playerx_change = -40
                 if event.key == pygame.K_RIGHT:
-                    playerx_change = 20
+                    playerx_change = 40
                 if event.key == pygame.K_SPACE:
                     if bullet_state == 'ready':
                         temp_x = player_x
@@ -144,15 +145,11 @@ def game_loop():
         player_blitting(screen, player, player_x, player_y)
         enemy_blitting(screen, enemy, enemy_x, enemy_y)
         show_score(screen, font, score, score_x, score_y)
-        if enemy_y >= 400 or enemy_y==player_y:
+        if enemy_y >= 400 or enemy_y == player_y:
             game_over(screen, over_font, 200, 250)
-            # score = 0
-            # enemyX_change = 10
-            # bulletY_change = 20
-            # enemyYchange = 0
-            # enemy, enemy_x, enemy_y = enemy_details()
-            # enemyX_change += score
-            # running = False
+            time.sleep(1)
+            running = False
+            print('Game over, Your score is: ', score)
         pygame.display.update()  # to update the screen (needs to be there to implement any changes)
 
 
